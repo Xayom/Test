@@ -1,25 +1,27 @@
+from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 from django.db import models
-
-bid_choices = (
-    ('cpc', 'cost per click'),
-    ('cpm', 'cost per mile'),
-    ('cpa', 'cost per action'),
-    ('cpv', 'cost per view'),
-    ('cpi', 'cost per install'),
-)
 
 
 class Channel(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=15)
     slug = models.CharField(max_length=15)
-    bidtypes = models.CharField(max_length=50, choices=bid_choices)
+    bidtypes = ArrayField(models.CharField(max_length=15))
 
     def __str__(self):
         return self.name
 
 
 class Campaign(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=15)
     channel = models.ForeignKey(Channel)
     bid = models.FloatField()
     bidType = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.bidType not in self.channel.bidtypes:
+            raise ValidationError("Bidtype should be in bidtypes channel")
+        super(Campaign, self).save(*args, **kwargs)
