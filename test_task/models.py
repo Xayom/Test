@@ -6,7 +6,7 @@ from django.db import models
 class Channel(models.Model):
     name = models.CharField(max_length=15)
     slug = models.CharField(max_length=15)
-    bidtypes = ArrayField(models.CharField(max_length=15))
+    bidtypes = ArrayField(models.CharField(max_length=50))
 
     def __str__(self):
         return self.name

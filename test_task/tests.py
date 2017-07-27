@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .models import Channel, Campaign
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 from django.core.urlresolvers import reverse
 
@@ -9,10 +9,10 @@ from django.core.urlresolvers import reverse
 
 class ChannelViewTest(TestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.channel_data = {'name': 'Go Go'}
+        self.client = APIClient(enforce_csrf_checks=True)
+        self.channel_data = {"name": "test", "slug": "test", "bidtypes": ["asflkla", "askflk", "askfl"]}
         self.response = self.client.post(
-            reverse('create'),
+            reverse('createchannel'),
             self.channel_data,
             format="json")
 
@@ -22,17 +22,17 @@ class ChannelViewTest(TestCase):
     def test_api_can_get_a_channel(self):
         channel = Channel.objects.get()
         response = self.client.get(
-            reverse('details'),
+            reverse('detailschannel'),
             kwargs={'pk': channel.id}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, channel)
 
     def test_api_can_update_channel(self):
-        change_channel = {'name': 'Something new'}
+        change_channel = {"name": "test1", "slug": "test1", "bidtypes": ["askla", "aflk", "askfl"]}
         channel = Channel.objects.get()
         res = self.client.put(
-            reverse('details', kwargs={'pk': channel.id}),
+            reverse('detailschannel', kwargs={'pk': channel.id}),
             change_channel, format='json'
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -40,7 +40,7 @@ class ChannelViewTest(TestCase):
     def test_api_can_delete_channel(self):
         channel = Channel.objects.get()
         response = self.client.delete(
-            reverse('details', kwargs={'pk': channel.id}),
+            reverse('detailschannel', kwargs={'pk': channel.id}),
             format='json',
             follow=True)
 
@@ -53,9 +53,9 @@ class ChannelViewTest(TestCase):
 class CampaignViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.campaign_data = {'name': 'Go Go'}
+        self.campaign_data = {"name": "campaign", "channel": 1, "bid":12, "bidtype": "asflkla"}
         self.response = self.client.post(
-            reverse('create'),
+            reverse('createcampaign'),
             self.campaign_data,
             format="json")
 
@@ -65,17 +65,17 @@ class CampaignViewTest(TestCase):
     def test_api_can_get_a_campaign(self):
         campaign = Campaign.objects.get()
         response = self.client.get(
-            reverse('details'),
+            reverse('detailscampaign'),
             kwargs={'pk': campaign.id}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, campaign)
 
     def test_api_can_update_campaign(self):
-        change_campaign = {'name': 'Something new'}
+        change_campaign = {"name": "campaign1", "channel": 1, "bid":32, "bidtype": "asflkla"}
         campaign = Campaign.objects.get()
         res = self.client.put(
-            reverse('details', kwargs={'pk': campaign.id}),
+            reverse('detailscampaign', kwargs={'pk': campaign.id}),
             change_campaign, format='json'
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -83,7 +83,7 @@ class CampaignViewTest(TestCase):
     def test_api_can_delete_campaign(self):
         campaign = Campaign.objects.get()
         response = self.client.delete(
-            reverse('details', kwargs={'pk': campaign.id}),
+            reverse('detailscampaign', kwargs={'pk': campaign.id}),
             format='json',
             follow=True)
 
