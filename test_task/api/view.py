@@ -8,12 +8,9 @@ from test_task.models import Channel, Campaign
 '''Channel API views'''
 
 
-class CreateChannelView(generics.ListCreateAPIView):
+class CreateChannelView(generics.CreateAPIView):
     queryset = Channel.objects.all()
     serializer_class = ChannelSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 
 class DetailsChannelView(generics.RetrieveUpdateDestroyAPIView):
@@ -29,7 +26,7 @@ class ListChannelView(generics.ListAPIView):
 '''Campaign API views'''
 
 
-class CreateCampaignView(generics.ListCreateAPIView):
+class CreateCampaignView(generics.CreateAPIView):
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
 
